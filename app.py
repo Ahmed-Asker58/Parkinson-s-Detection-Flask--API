@@ -46,7 +46,7 @@ def InitializeDataAndLabels(path):
 		image = cv2.threshold(image, 0, 255,
 			cv2.THRESH_BINARY_INV | cv2.THRESH_OTSU)[1]
 		# quantify the image
-		features = quantify_image(image)
+		features = ExtractFeatures(image)
 		# update the data and labels lists, respectively
 		data.append(features)
 		labels.append(label)

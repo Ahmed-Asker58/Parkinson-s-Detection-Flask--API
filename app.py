@@ -12,7 +12,7 @@ from PIL import Image
 app = Flask(__name__)
 
 #compute the histogram of every image to extract featues
-def quantify_image(image):
+def ExtractFeatures(image):
 	# compute the histogram of oriented gradients feature vector for
 	# the input image
 	features = feature.hog(image, orientations=9,
@@ -25,7 +25,7 @@ def quantify_image(image):
 
 
 #collect features along with its data
-def Train(path):
+def InitializeDataAndLabels(path):
 	
 	# grab the list of images in the input directory, then initialize
 	# the list of data (i.e., images) and class labels
@@ -54,61 +54,32 @@ def Train(path):
 	return (np.array(data), np.array(labels))
 
 
-def TrainTest(path):
-	# grab the list of images in the input directory, then initialize
-	# the list of data (i.e., images) and class labels
-	imagePaths = list(paths.list_images(path))
-	data = []
-	
-	# loop over the image paths [healthy,parkinson]
-	for imagePath in imagePaths:
-		# extract the class label from the filename
-		label = imagePath.split(os.path.sep)[-2]
-		# load the input image, convert it to grayscale, and resize
-		# it to 200x200 pixels, ignoring aspect ratio
-		image = cv2.imread(imagePath)
-		image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-		image = cv2.resize(image, (200, 200))
-		# threshold the image such that the drawing appears as white
-		# on a black background
-		image = cv2.threshold(image, 0, 255,
-			cv2.THRESH_BINARY_INV | cv2.THRESH_OTSU)[1]
-		# quantify the image
-		features = quantify_image(image)
-		# update the data and labels lists, respectively
-		data.append(features)
-		
-	# return the data and labels
-	return (np.array(data))
 
 
 # define the path to the training and testing directories
 trainingPath = r"D:\dataset\wave\training"
-testingPath = r"D:\dataset\wave\testing"
+
 
 #training the data
-(trainX, trainY) = Train(trainingPath)
-(testX) = TrainTest(testingPath)
+(trainX, trainY) = InitializeDataAndLabels(trainingPath)
+
 # encode the labels as integers
 le = LabelEncoder()
 trainY = le.fit_transform(trainY)
 
 
 
-# loop over the number of trials to run
-for i in range(0, 5):
-	# train the model
-	
-	model = RandomForestClassifier(n_estimators=100)
-	model.fit(trainX, trainY)
-	# make predictions on the testing data and initialize a dictionary
-	# to store our computed metrics
-	predictions = model.predict(testX)
-	
+def Train():
+    for i in range(0,5):
+        model = RandomForestClassifier(n_estimators=100)
+        model.fit(trainX,trainY)
+        return model
+        
 
 
 
 
+Model = Train()
 def Predict(image):
     results = []
 	# load the testing image, clone it, and resize it
@@ -118,8 +89,8 @@ def Predict(image):
     image = cv2.threshold(image, 0, 255,
 		cv2.THRESH_BINARY_INV | cv2.THRESH_OTSU)[1]
 	
-    features = quantify_image(image)
-    preds = model.predict([features])
+    features = ExtractFeatures(image)
+    preds = Model.predict([features])
     label = le.inverse_transform(preds)[0]
     results.append(label)
     if("parkinson" in results):
@@ -131,7 +102,6 @@ def Predict(image):
 def preprossing(image):
     image=Image.open(image)
     image_arr = np.array(image.convert('RGB'))
-   
     return image_arr
 
 

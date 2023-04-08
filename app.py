@@ -99,6 +99,7 @@ def Predict(image):
      return "healthy"
     
 
+#preprossing the image sent from the client-side
 def preprossing(image):
     image=Image.open(image)
     image_arr = np.array(image.convert('RGB'))

@@ -26,28 +26,17 @@ def ExtractFeatures(image):
 
 #collect features along with its data
 def InitializeDataAndLabels(path):
-	
-	# grab the list of images in the input directory, then initialize
-	# the list of data (i.e., images) and class labels
 	imagePaths = list(paths.list_images(path))
 	data = []
 	labels = []
-	# loop over the image paths [healthy,parkinson]
 	for imagePath in imagePaths:
-		# extract the class label from the filename
 		label = imagePath.split(os.path.sep)[-2]
-		# load the input image, convert it to grayscale, and resize
-		# it to 200x200 pixels, ignoring aspect ratio
 		image = cv2.imread(imagePath)
 		image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 		image = cv2.resize(image, (200, 200))
-		# threshold the image such that the drawing appears as white
-		# on a black background
 		image = cv2.threshold(image, 0, 255,
 			cv2.THRESH_BINARY_INV | cv2.THRESH_OTSU)[1]
-		# quantify the image
 		features = ExtractFeatures(image)
-		# update the data and labels lists, respectively
 		data.append(features)
 		labels.append(label)
 	# return the data and labels

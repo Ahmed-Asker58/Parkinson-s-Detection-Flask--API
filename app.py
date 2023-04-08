@@ -23,7 +23,8 @@ def quantify_image(image):
 
 
 
-#train on the data set
+
+#collect features along with its data
 def Train(path):
 	
 	# grab the list of images in the input directory, then initialize
@@ -82,8 +83,8 @@ def TrainTest(path):
 
 
 # define the path to the training and testing directories
-trainingPath = r"D:\dataset2\wave\training"
-testingPath = r"D:\dataset2\wave\testing"
+trainingPath = r"D:\dataset\wave\training"
+testingPath = r"D:\dataset\wave\testing"
 
 #training the data
 (trainX, trainY) = Train(trainingPath)

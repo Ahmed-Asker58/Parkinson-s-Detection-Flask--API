@@ -1,0 +1,7 @@
+gunicorn
+flask
+scikit-learn
+scikit-image
+imutils
+opencv-python
+numpy

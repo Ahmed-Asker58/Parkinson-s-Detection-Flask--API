@@ -8,67 +8,21 @@ import numpy as np
 import cv2
 import os
 from PIL import Image
+import pickle
+from TrainWave import WaveModelFile, ExtractFeatures 
+
 
 app = Flask(__name__)
 
-#compute the histogram of every image to extract featues
-def ExtractFeatures(image):
-	# compute the histogram of oriented gradients feature vector for
-	# the input image
-	features = feature.hog(image, orientations=9,
-		pixels_per_cell=(10, 10), cells_per_block=(2, 2),
-		transform_sqrt=True, block_norm="L1")
-	# return the feature vector
-	return features
 
 
+file = open('object.pkl', 'rb')
+le = pickle.load(file)
+file.close()
 
 
-#collect features along with its data
-def InitializeDataAndLabels(path):
-	imagePaths = list(paths.list_images(path))
-	data = []
-	labels = []
-	for imagePath in imagePaths:
-		label = imagePath.split(os.path.sep)[-2]
-		image = cv2.imread(imagePath)
-		image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-		image = cv2.resize(image, (200, 200))
-		image = cv2.threshold(image, 0, 255,
-			cv2.THRESH_BINARY_INV | cv2.THRESH_OTSU)[1]
-		features = ExtractFeatures(image)
-		data.append(features)
-		labels.append(label)
-	# return the data and labels
-	return (np.array(data), np.array(labels))
+Wave_Model_Loaded = pickle.load(open(WaveModelFile, 'rb'))
 
-
-
-
-# define the path to the training and testing directories
-trainingPath = r"D:\dataset\wave\training"
-
-
-#training the data
-(trainX, trainY) = InitializeDataAndLabels(trainingPath)
-
-# encode the labels as integers
-le = LabelEncoder()
-trainY = le.fit_transform(trainY)
-
-
-
-def Train():
-    for i in range(0,5):
-        model = RandomForestClassifier(n_estimators=100)
-        model.fit(trainX,trainY)
-        return model
-        
-
-
-
-
-Model = Train()
 def Predict(image):
     results = []
 	# load the testing image, clone it, and resize it
@@ -79,7 +33,7 @@ def Predict(image):
 		cv2.THRESH_BINARY_INV | cv2.THRESH_OTSU)[1]
 	
     features = ExtractFeatures(image)
-    preds = Model.predict([features])
+    preds = Wave_Model_Loaded.predict([features])
     label = le.inverse_transform(preds)[0]
     results.append(label)
     if("parkinson" in results):

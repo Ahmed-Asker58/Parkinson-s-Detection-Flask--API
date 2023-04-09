@@ -9,7 +9,7 @@ import cv2
 import os
 from PIL import Image
 import pickle
-from TrainWave import WaveModelFile, ExtractFeatures 
+from TrainWave import  ExtractFeatures 
 
 
 app = Flask(__name__)
@@ -20,8 +20,7 @@ file = open('object.pkl', 'rb')
 le = pickle.load(file)
 file.close()
 
-
-Wave_Model_Loaded = pickle.load(open(WaveModelFile, 'rb'))
+Wave_Model_Loaded = pickle.load(open('finalized_model.sav', 'rb'))
 
 def Predict(image):
     results = []

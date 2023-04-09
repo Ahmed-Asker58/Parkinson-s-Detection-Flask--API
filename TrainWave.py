@@ -38,6 +38,7 @@ def InitializeDataAndLabels(path):
 trainingPath = r"D:\dataset\wave\training"
 
 #initialize data and labels
+'''
 (trainX, trainY) = InitializeDataAndLabels(trainingPath)
 
 
@@ -48,7 +49,7 @@ file = open('object.pkl', 'wb')
 pickle.dump(le, file)
 file.close()
 # encode the labels as integers
-'''
+
 le = LabelEncoder()
 trainY = le.fit_transform(trainY)
 '''
@@ -66,8 +67,10 @@ def Train():
 
 
 
-WaveModelTrained = Train()
+# WaveModelTrained = Train()
 
 
+'''
 WaveModelFile = 'finalized_model.sav'
 pickle.dump(WaveModelTrained, open(WaveModelFile, 'wb'))
+'''

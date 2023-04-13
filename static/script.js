@@ -1,6 +1,6 @@
-$('#fileup').change(function(){
+$('#wave').change(function(){
     //here we take the file extension and set an array of valid extensions
-        var res=$('#fileup').val();
+        var res=$('#wave').val();
         var arr = res.split("\\");
         var filename=arr.slice(-1)[0];
         filextension=filename.split(".");

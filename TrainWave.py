@@ -50,8 +50,7 @@ pickle.dump(le, file)
 file.close()
 # encode the labels as integers
 
-le = LabelEncoder()
-trainY = le.fit_transform(trainY)
+
 '''
 
 

@@ -7,22 +7,30 @@ from imutils import paths
 import numpy as np
 import cv2
 import os
-from PIL import Image
 import pickle
+from PIL import Image
 from TrainWave import  ExtractFeatures 
-
 
 app = Flask(__name__)
 
-
-
+#get the label encoder of wave dataset
 file = open('object.pkl', 'rb')
 le = pickle.load(file)
 file.close()
 
-Wave_Model_Loaded = pickle.load(open('finalized_model.sav', 'rb'))
+#get the label encoder of spiral dataset
+file = open('spiral_label_encoder_object.pkl', 'rb')
+le2 = pickle.load(file)
+file.close()
 
-def Predict(image):
+Wave_Model_Loaded = pickle.load(open('finalized_model.sav', 'rb'))
+Spiral_Model_Loaded = pickle.load(open('finalized_model2.sav','rb'))
+
+def Predict(image,photoTybe):
+    if(photoTybe == 'wave'):
+     Model = Wave_Model_Loaded
+    elif(photoTybe == 'spiral'):
+     Model = Spiral_Model_Loaded
     results = []
 	# load the testing image, clone it, and resize it
 	# pre-process the image in the same manner we did earlier
@@ -32,7 +40,7 @@ def Predict(image):
 		cv2.THRESH_BINARY_INV | cv2.THRESH_OTSU)[1]
 	
     features = ExtractFeatures(image)
-    preds = Wave_Model_Loaded.predict([features])
+    preds = Model.predict([features])
     label = le.inverse_transform(preds)[0]
     results.append(label)
     if("parkinson" in results):
@@ -58,12 +66,12 @@ def index():
 def api():
     # Get the image from post request
     try:
-        if 'fileup' not in request.files:
+        if 'wave' not in request.files:
             return "Please try again. The Image doesn't exist"
-        image = request.files.get('fileup')
+        image = request.files.get('wave')
         image = preprossing(image)
         print("Model predicting ...")
-        result = Predict(image)
+        result = Predict(image,"wave")
         print("Model predicted")
         print(result)
         return jsonify({'prediction': result})
@@ -73,22 +81,40 @@ def api():
 
 
 
-@app.route('/predict', methods=['GET', 'POST'])
-def predict():
+@app.route('/predictwaves', methods=['GET', 'POST'])
+def predictwaves():
     print("run code")
     if request.method == 'POST':
         # Get the image from post request
         print("image loading....")
-        image = request.files['fileup']
+        image = request.files['wave']
         print("image loaded....")
         image = preprossing(image)
-        result = Predict(image)
+        result = Predict(image,'wave')
         print("predicted ...")
         print(result)
 
         return render_template('index.html', prediction=result, appName="Parkinson's Detection")
     else:
         return render_template('index.html',appName="Parkinson's Detection")
+
+
+@app.route('/predictspirals', methods=['GET', 'POST'])
+def predictspirals():
+    print("run code")
+    if request.method == 'POST':
+        # Get the image from post request
+        print("image loading....")
+        image = request.files['spiral']
+        print("image loaded....")
+        image = preprossing(image)
+        result = Predict(image,'spiral')
+        print("predicted ...")
+        print(result)
+
+        return render_template('index2.html', prediction=result, appName="Parkinson's Detection")
+    else:
+        return render_template('index2.html',appName="Parkinson's Detection")
 
 
 

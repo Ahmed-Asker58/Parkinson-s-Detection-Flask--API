@@ -26,6 +26,7 @@ file.close()
 Wave_Model_Loaded = pickle.load(open('finalized_model.sav', 'rb'))
 Spiral_Model_Loaded = pickle.load(open('finalized_model2.sav','rb'))
 
+#predict depending on the model entered as a string 
 def Predict(image,photoTybe):
     if(photoTybe == 'wave'):
      Model = Wave_Model_Loaded
@@ -61,9 +62,9 @@ def index():
     return render_template('index.html', appName="Parkinson's Detection")
 
 
-
-@app.route('/predictApi', methods=["POST"])
-def api():
+#an API to predict waves
+@app.route('/predictwavesApi', methods=["POST"])
+def wave_api():
     # Get the image from post request
     try:
         if 'wave' not in request.files:
@@ -71,13 +72,31 @@ def api():
         image = request.files.get('wave')
         image = preprossing(image)
         print("Model predicting ...")
-        result = Predict(image,"wave")
+        result = Predict(image,'wave')
         print("Model predicted")
         print(result)
         return jsonify({'prediction': result})
     except:
         return jsonify({'Error': 'Error occur'})
     
+
+
+#an API to predict waves
+@app.route('/predictspiralsApi', methods=["POST"])
+def spiral_api():
+    # Get the image from post request
+    try:
+        if 'spiral' not in request.files:
+            return "Please try again. The Image doesn't exist"
+        image = request.files.get('spiral')
+        image = preprossing(image)
+        print("Model predicting ...")
+        result = Predict(image,'spiral')
+        print("Model predicted")
+        print(result)
+        return jsonify({'prediction': result})
+    except:
+        return jsonify({'Error': 'Error occur'})
 
 
 
